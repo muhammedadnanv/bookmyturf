@@ -106,15 +106,7 @@ const TurfDetail = () => {
         transaction_id: `MOCK_${Date.now()}`,
       });
 
-      // Create payout ledger entry
-      await supabase.from("payout_ledger").insert({
-        owner_id: turf.owner_id,
-        booking_id: bookingData.id,
-        total_amount: price,
-        commission_rate: 10,
-        commission_amount: commission,
-        owner_payout: ownerAmount,
-      });
+      // Payout ledger entry is auto-created by database trigger
 
       toast({ title: "Booking confirmed! 🎉", description: `Your slot is booked for ${format(selectedDate, "PPP")}` });
       setSelectedSlot(null);
