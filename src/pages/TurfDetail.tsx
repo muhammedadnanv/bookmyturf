@@ -9,8 +9,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import { MapPin, Clock, IndianRupee, CheckCircle2 } from "lucide-react";
+import { MapPin, Clock, IndianRupee, CheckCircle2, ChevronLeft, ChevronRight } from "lucide-react";
 import { format } from "date-fns";
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel";
 
 const SPORT_LABELS: Record<string, string> = {
   cricket: "🏏 Cricket", football: "⚽ Football", badminton: "🏸 Badminton",
@@ -136,11 +137,27 @@ const TurfDetail = () => {
   return (
     <div className="container py-8">
       {/* Images */}
-      <div className="mb-6 overflow-hidden rounded-xl bg-muted aspect-video">
-        {images.length > 0 ? (
-          <img src={images[0].image_url} alt={turf.name} className="h-full w-full object-cover" />
+      <div className="mb-6">
+        {images.length > 1 ? (
+          <Carousel className="w-full">
+            <CarouselContent>
+              {images.map((img: any, i: number) => (
+                <CarouselItem key={i}>
+                  <div className="aspect-video overflow-hidden rounded-xl bg-muted">
+                    <img src={img.image_url} alt={`${turf.name} - ${i + 1}`} className="h-full w-full object-cover" />
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="left-2" />
+            <CarouselNext className="right-2" />
+          </Carousel>
+        ) : images.length === 1 ? (
+          <div className="aspect-video overflow-hidden rounded-xl bg-muted">
+            <img src={images[0].image_url} alt={turf.name} className="h-full w-full object-cover" />
+          </div>
         ) : (
-          <div className="flex h-full items-center justify-center text-6xl">🏟️</div>
+          <div className="flex aspect-video items-center justify-center rounded-xl bg-muted text-6xl">🏟️</div>
         )}
       </div>
 
