@@ -1,7 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { MapPin, LogOut, User, LayoutDashboard } from "lucide-react";
+import { LogOut, User, LayoutDashboard } from "lucide-react";
+import logoIcon from "@/assets/logo-icon.png";
 
 const Navbar = () => {
   const { user, role, signOut } = useAuth();
@@ -13,9 +14,7 @@ const Navbar = () => {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
-            <MapPin className="h-5 w-5 text-primary-foreground" />
-          </div>
+          <img src={logoIcon} alt="BookMyTurf" className="h-9 w-9 rounded-lg" />
           <span className="font-display text-xl font-bold">BookMyTurf</span>
         </Link>
 
