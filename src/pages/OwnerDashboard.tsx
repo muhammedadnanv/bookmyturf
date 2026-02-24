@@ -15,6 +15,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useToast } from "@/hooks/use-toast";
 import { Plus, IndianRupee, TrendingUp, CalendarDays, MapPin } from "lucide-react";
 import { format } from "date-fns";
+import TurfImageUpload, { uploadTurfImages } from "@/components/owner/TurfImageUpload";
 
 const AMENITIES = ["Parking", "Changing Room", "Drinking Water", "Floodlights", "Washroom", "Cafeteria", "First Aid", "WiFi"];
 const SPORT_OPTIONS = ["cricket", "football", "badminton", "tennis", "basketball", "hockey", "volleyball", "other"] as const;
@@ -35,6 +36,7 @@ const OwnerDashboard = () => {
   const [sportType, setSportType] = useState<string>("cricket");
   const [amenities, setAmenities] = useState<string[]>([]);
   const [hourlyPrice, setHourlyPrice] = useState("");
+  const [turfImages, setTurfImages] = useState<File[]>([]);
 
   // Slot form state
   const [slotTurfId, setSlotTurfId] = useState<string | null>(null);
@@ -91,20 +93,25 @@ const OwnerDashboard = () => {
 
   const createTurf = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("turfs").insert({
+      const { data, error } = await supabase.from("turfs").insert({
         owner_id: user!.id,
         name, description, city, area, address,
         sport_type: sportType as any,
         amenities,
         hourly_price: Number(hourlyPrice),
-      });
+      }).select().single();
       if (error) throw error;
+
+      // Upload images if any
+      if (turfImages.length > 0) {
+        await uploadTurfImages(data.id, turfImages);
+      }
     },
     onSuccess: () => {
       toast({ title: "Turf created!", description: "It will be visible after admin approval." });
       qc.invalidateQueries({ queryKey: ["owner-turfs"] });
       setShowCreate(false);
-      setName(""); setDescription(""); setCity(""); setArea(""); setAddress(""); setAmenities([]); setHourlyPrice("");
+      setName(""); setDescription(""); setCity(""); setArea(""); setAddress(""); setAmenities([]); setHourlyPrice(""); setTurfImages([]);
     },
     onError: (err: any) => toast({ title: "Failed", description: err.message, variant: "destructive" }),
   });
@@ -166,6 +173,10 @@ const OwnerDashboard = () => {
                 </div>
               </div>
               <div className="space-y-2"><Label>Hourly Price (₹)</Label><Input type="number" value={hourlyPrice} onChange={e => setHourlyPrice(e.target.value)} /></div>
+              <div className="space-y-2">
+                <Label>Photos</Label>
+                <TurfImageUpload images={turfImages} onImagesChange={setTurfImages} />
+              </div>
               <Button className="w-full" onClick={() => createTurf.mutate()} disabled={createTurf.isPending || !name || !city || !area || !hourlyPrice}>
                 {createTurf.isPending ? "Creating..." : "Create Turf"}
               </Button>
