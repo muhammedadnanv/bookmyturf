@@ -13,9 +13,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, IndianRupee, TrendingUp, CalendarDays, MapPin } from "lucide-react";
+import { Plus, IndianRupee, TrendingUp, CalendarDays, MapPin, Pencil } from "lucide-react";
 import { format } from "date-fns";
 import TurfImageUpload, { uploadTurfImages } from "@/components/owner/TurfImageUpload";
+import EditTurfDialog from "@/components/owner/EditTurfDialog";
 
 const AMENITIES = ["Parking", "Changing Room", "Drinking Water", "Floodlights", "Washroom", "Cafeteria", "First Aid", "WiFi"];
 const SPORT_OPTIONS = ["cricket", "football", "badminton", "tennis", "basketball", "hockey", "volleyball", "other"] as const;
@@ -26,6 +27,7 @@ const OwnerDashboard = () => {
   const { toast } = useToast();
   const qc = useQueryClient();
   const [showCreate, setShowCreate] = useState(false);
+  const [editTurf, setEditTurf] = useState<any>(null);
 
   // Form state
   const [name, setName] = useState("");
@@ -208,6 +210,9 @@ const OwnerDashboard = () => {
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge className={STATUS_MAP[t.status]}>{t.status}</Badge>
+                      <Button variant="outline" size="sm" onClick={() => setEditTurf(t)}>
+                        <Pencil className="mr-1.5 h-3 w-3" />Edit
+                      </Button>
                       <Dialog>
                         <DialogTrigger asChild><Button variant="outline" size="sm" onClick={() => setSlotTurfId(t.id)}>Add Slot</Button></DialogTrigger>
                         <DialogContent>
@@ -263,6 +268,9 @@ const OwnerDashboard = () => {
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Edit Turf Dialog */}
+      <EditTurfDialog turf={editTurf} open={!!editTurf} onOpenChange={(open) => { if (!open) setEditTurf(null); }} />
     </div>
   );
 };
