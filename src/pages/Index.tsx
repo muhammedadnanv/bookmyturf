@@ -56,7 +56,7 @@ const Index = () => {
         <div className="container relative z-10">
           <div className="mx-auto max-w-3xl text-center">
             <Badge variant="secondary" className="mb-4 text-sm">
-              🏟️ India's Turf Booking Platform
+              🏟️ India's #1 Turf Booking Platform
             </Badge>
             <h1 className="font-display text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
               Book Your Perfect

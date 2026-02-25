@@ -61,7 +61,7 @@ const Auth = () => {
           <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-primary">
             <MapPin className="h-6 w-6 text-primary-foreground" />
           </div>
-          <CardTitle className="font-display text-2xl">TurfSpot</CardTitle>
+          <CardTitle className="font-display text-2xl">TurfNest</CardTitle>
           <CardDescription>Book your favorite sports turf in seconds</CardDescription>
         </CardHeader>
         <CardContent>
