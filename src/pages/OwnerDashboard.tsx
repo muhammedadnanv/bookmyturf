@@ -13,10 +13,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, IndianRupee, TrendingUp, CalendarDays, MapPin, Pencil } from "lucide-react";
+import { Plus, IndianRupee, TrendingUp, CalendarDays, MapPin, Pencil, Clock } from "lucide-react";
 import { format } from "date-fns";
 import TurfImageUpload, { uploadTurfImages } from "@/components/owner/TurfImageUpload";
 import EditTurfDialog from "@/components/owner/EditTurfDialog";
+import ManageSlotsDialog from "@/components/owner/ManageSlotsDialog";
 
 const AMENITIES = ["Parking", "Changing Room", "Drinking Water", "Floodlights", "Washroom", "Cafeteria", "First Aid", "WiFi"];
 const SPORT_OPTIONS = ["cricket", "football", "badminton", "tennis", "basketball", "hockey", "volleyball", "other"] as const;
@@ -28,6 +29,7 @@ const OwnerDashboard = () => {
   const qc = useQueryClient();
   const [showCreate, setShowCreate] = useState(false);
   const [editTurf, setEditTurf] = useState<any>(null);
+  const [slotsTurf, setSlotsTurf] = useState<any>(null);
 
   // Form state
   const [name, setName] = useState("");
@@ -40,11 +42,6 @@ const OwnerDashboard = () => {
   const [hourlyPrice, setHourlyPrice] = useState("");
   const [turfImages, setTurfImages] = useState<File[]>([]);
 
-  // Slot form state
-  const [slotTurfId, setSlotTurfId] = useState<string | null>(null);
-  const [slotDay, setSlotDay] = useState("1");
-  const [slotStart, setSlotStart] = useState("06:00");
-  const [slotEnd, setSlotEnd] = useState("07:00");
 
   const { data: turfs, isLoading } = useQuery({
     queryKey: ["owner-turfs", user?.id],
@@ -118,22 +115,6 @@ const OwnerDashboard = () => {
     onError: (err: any) => toast({ title: "Failed", description: err.message, variant: "destructive" }),
   });
 
-  const addSlot = useMutation({
-    mutationFn: async () => {
-      const { error } = await supabase.from("turf_slots").insert({
-        turf_id: slotTurfId!,
-        day_of_week: Number(slotDay),
-        start_time: slotStart,
-        end_time: slotEnd,
-      });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast({ title: "Slot added!" });
-      setSlotTurfId(null);
-    },
-    onError: (err: any) => toast({ title: "Failed", description: err.message, variant: "destructive" }),
-  });
 
   const STATUS_MAP: Record<string, string> = { pending: "bg-yellow-100 text-yellow-800", approved: "bg-green-100 text-green-800", rejected: "bg-red-100 text-red-800", deactivated: "bg-gray-100 text-gray-800" };
 
@@ -213,28 +194,9 @@ const OwnerDashboard = () => {
                       <Button variant="outline" size="sm" onClick={() => setEditTurf(t)}>
                         <Pencil className="mr-1.5 h-3 w-3" />Edit
                       </Button>
-                      <Dialog>
-                        <DialogTrigger asChild><Button variant="outline" size="sm" onClick={() => setSlotTurfId(t.id)}>Add Slot</Button></DialogTrigger>
-                        <DialogContent>
-                          <DialogHeader><DialogTitle>Add Time Slot</DialogTitle></DialogHeader>
-                          <div className="space-y-4">
-                            <div className="space-y-2">
-                              <Label>Day</Label>
-                              <Select value={slotDay} onValueChange={setSlotDay}>
-                                <SelectTrigger><SelectValue /></SelectTrigger>
-                                <SelectContent>{DAY_NAMES.map((d, i) => <SelectItem key={i} value={String(i)}>{d}</SelectItem>)}</SelectContent>
-                              </Select>
-                            </div>
-                            <div className="grid grid-cols-2 gap-3">
-                              <div className="space-y-2"><Label>Start</Label><Input type="time" value={slotStart} onChange={e => setSlotStart(e.target.value)} /></div>
-                              <div className="space-y-2"><Label>End</Label><Input type="time" value={slotEnd} onChange={e => setSlotEnd(e.target.value)} /></div>
-                            </div>
-                            <Button className="w-full" onClick={() => addSlot.mutate()} disabled={addSlot.isPending}>
-                              {addSlot.isPending ? "Adding..." : "Add Slot"}
-                            </Button>
-                          </div>
-                        </DialogContent>
-                      </Dialog>
+                      <Button variant="outline" size="sm" onClick={() => setSlotsTurf(t)}>
+                        <Clock className="mr-1.5 h-3 w-3" />Slots
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -271,6 +233,14 @@ const OwnerDashboard = () => {
 
       {/* Edit Turf Dialog */}
       <EditTurfDialog turf={editTurf} open={!!editTurf} onOpenChange={(open) => { if (!open) setEditTurf(null); }} />
+
+      {/* Manage Slots Dialog */}
+      <ManageSlotsDialog
+        turfId={slotsTurf?.id ?? null}
+        turfName={slotsTurf?.name ?? ""}
+        open={!!slotsTurf}
+        onOpenChange={(open) => { if (!open) setSlotsTurf(null); }}
+      />
     </div>
   );
 };
